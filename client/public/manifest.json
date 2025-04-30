@@ -1,0 +1,6 @@
+{
+  "short_name": "RunTracker",
+  "name": "Outdoor Run Tracker",
+  "start_url": ".",
+  "display": "standalone"
+}

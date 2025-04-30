@@ -1,0 +1,9 @@
+# Node.js dependencies
+node_modules/
+server/node_modules/
+
+# macOS Finder metadata
+.DS_Store
+
+# Environment files
+.env

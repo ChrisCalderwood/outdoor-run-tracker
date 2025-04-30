@@ -1,0 +1,59 @@
+/* App.css */
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom right, #dbeafe, #93c5fd);
+}
+
+.app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.card {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  margin: 0 1rem; /* Add side margin for small screens */
+  box-sizing: border-box;
+}
+
+.card h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #1e3a8a;
+}
+
+.card p {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  color: #374151;
+}
+
+.card button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.card button:hover {
+  background-color: #1d4ed8;
+}
+
+@media (max-width: 375px) {
+  .card {
+    padding: 1.5rem;
+  }
+}

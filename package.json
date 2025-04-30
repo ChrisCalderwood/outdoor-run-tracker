@@ -1,0 +1,26 @@
+{
+  "name": "outdoor-run-tracker",
+  "version": "1.0.0",
+  "description": "Building a full-stack AWS Web App that tracks outdoor runs and walks.",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm --prefix server start",
+    "client": "npm --prefix client start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChrisCalderwood/outdoor-run-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ChrisCalderwood/outdoor-run-tracker/issues"
+  },
+  "homepage": "https://github.com/ChrisCalderwood/outdoor-run-tracker#readme",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
