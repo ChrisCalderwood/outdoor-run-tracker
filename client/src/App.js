@@ -1,18 +1,25 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
+import { useAuthenticator } from '@aws-amplify/ui-react';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { v4 as uuidv4 } from 'uuid';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import History from './history';
+import Summary from './summary';
 import './App.css';
 
 function App() {
+  const navigate = useNavigate();
+  const { signOut } = useAuthenticator(context => []);
   const [tracking, setTracking] = useState(false);
-  const [pointsCount, setPointsCount] = useState(0);
   const [summary, setSummary] = useState(null);
   const runIdRef = useRef(null);
   const intervalIdRef = useRef(null);
 
   const handleStartStop = () => {
     if (!tracking) {
+      setSummary(null);     // clear last summary
+
       // Start polling every 10 seconds
       runIdRef.current = uuidv4();
       intervalIdRef.current = setInterval(() => {
@@ -35,8 +42,6 @@ function App() {
             })
               .then(res => console.log('Location saved:', res.data))
               .catch(err => console.error('Error saving location:', err));
-
-              setPointsCount(count => count + 1);
           },
           error => {
             console.error('Geolocation error:', error);
@@ -75,22 +80,59 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <div className="card">
-        <h1>Outdoor Run Tracker</h1>
-        <p>Points sent to server: {pointsCount}</p>
-        <button onClick={handleStartStop}>
-          {tracking ? 'Stop Run' : 'Start Run'}
+    <div className="app">
+      {/* put your nav controls in their own flex container */}
+      <div className="nav-buttons">
+        <button 
+          className="btn-secondary" 
+          onClick={() => navigate('/history')}
+        >
+          Run History
         </button>
+        <button 
+          className="btn-secondary" 
+          onClick={signOut}
+        >
+          Sign Out
+        </button>
+      </div>
 
-        {/* Conditionally show the run summary once it’s available */}
+      <div className="card">
+        <header className="card-header">
+          <h1 className="title">Outdoor Run Tracker</h1>
+        </header>
+
+        <div className="card-body">
+          {/* Welcome blurb */}
+          <p className="welcome">
+            Welcome to Run Tracker! <br />
+            You can track and review your runs and stats. <br />
+            Tap “Start Run” to begin, then tap again to finish. <br />
+            View past runs with “Run History”. <br />
+            Happy running! <br />
+          </p>
+          <button className="btn-primary" onClick={handleStartStop}>
+            {tracking ? 'Finish Run' : 'Start Run'}
+          </button>
+          {/* Note about location permissions */}
+          <p className="note">
+            Note: Please enable location services in your browser settings for this app to work.
+          </p>
+        </div>
+
         {summary && (
           <div className="stats-card">
             <h2>Run Summary</h2>
-            <p>Distance: {(summary.totalDistanceMeters / 1000).toFixed(2)} km</p>
-            <p>Time: {Math.round(summary.totalTimeSeconds)} sec</p>
-            <p>Avg Speed: {(summary.averageSpeedMps * 3.6).toFixed(2)} km/h</p>
-            <p>Top Speed: {(summary.maxSpeedMps * 3.6).toFixed(2)} km/h</p>
+            {summary.message ? (
+              <p>{summary.message}</p>
+            ) : (
+              <>
+                <p>Distance: {(summary.totalDistanceMeters/1000).toFixed(2)} km</p>
+                <p>Time: {Math.round(summary.totalTimeSeconds)} sec</p>
+                <p>Avg Speed: {(summary.averageSpeedMps*3.6).toFixed(2)} km/h</p>
+                <p>Top Speed: {(summary.maxSpeedMps*3.6).toFixed(2)} km/h</p>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -98,4 +140,12 @@ function App() {
   );
 }
 
-export default App;
+export default function Root() {
+  return (
+    <Routes>
+      <Route path="/" element={<App />} />
+      <Route path="/history" element={<History />} />
+      <Route path="/summary/:runId" element={<Summary />} />
+    </Routes>
+  );
+}

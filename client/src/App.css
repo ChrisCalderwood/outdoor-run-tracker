@@ -1,60 +1,184 @@
 /* App.css */
 
-body {
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to bottom right, #dbeafe, #93c5fd);
-}
-
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2rem;
+.app {
+  position: relative;
   min-height: 100vh;
-}
-
-.card {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  max-width: 400px;
-  width: 100%;
-  margin: 0 1rem; /* Add side margin for small screens */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e0f5ff, #f4fcff);
+  padding: 1rem;
   box-sizing: border-box;
 }
 
-.card h1 {
+.card {
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  overflow: hidden;
+}
+
+/* Card header now flex with title on left and nav-buttons on right */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #eef2f5;
+}
+
+/* Title styling (if you want smaller/larger) */
+.card-header .title {
+  margin: 0;
   font-size: 2rem;
-  margin-bottom: 1rem;
-  color: #1e3a8a;
+  color: #1f3c88;
+  white-space: nowrap;
 }
 
-.card p {
+/* Nav button group, floated top-left */
+.nav-buttons {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+/* Base link-style buttons */
+.nav-buttons button {
+  background: none;
+  border: none;
+  padding: 0;
   font-size: 1rem;
-  margin-bottom: 2rem;
-  color: #374151;
+  color: #1f3c88;
+  cursor: pointer;
 }
 
-.card button {
-  background-color: #2563eb;
+/* Hover: only underline + slight color shift */
+.nav-buttons button:hover {
+  color: #1f3088;
+  text-decoration: underline;
+}
+
+.card-body {
+  padding: 1.5rem;
+  text-align: center;
+}
+
+/* Welcome blurb styling */
+.welcome {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #333;
+  text-align: center;
+}
+
+/* Note under the button */
+.note {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  color: #666;
+  text-align: left;
+}
+
+.btn-primary {
+  background: #1f3c88;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 999px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.2s;
 }
 
-.card button:hover {
-  background-color: #1d4ed8;
+.btn-primary:hover {
+  background: #162f6c;
 }
 
+.stats-card {
+  background: #f9fcff;
+  border-top: 1px solid #eef2f5;
+  padding: 1.5rem;
+}
+
+.stats-card h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  color: #1f3c88;
+}
+
+.stats-card p {
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+/* history list */
+.history {
+  padding: 2rem;
+  max-width: 600px;
+  margin: auto;
+}
+
+.run-list {
+  list-style: none;
+  padding: 0;
+}
+
+.run-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #eef2f5;
+}
+
+.run-list button {
+  background: #1f3c88;
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+/* full-screen flexbox container for summary page */
+.summary-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;      /* stack back button + card */
+  align-items: center;         /* center horizontally */
+  justify-content: flex-start; /* start from top */
+  background: linear-gradient(135deg, #e0f5ff, #f4fcff);
+  padding-top: 2rem;           /* give some space so back btn isn't flush against the top */
+  box-sizing: border-box;
+}
+
+/* position the back button at upper-left within our centered column */
+.summary-back {
+  align-self: flex-start; /* push it to the left edge of the container */
+  margin-left: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* reuse your existing card style, but constrain its width */
+.summary-card {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Small phones */
 @media (max-width: 375px) {
   .card {
-    padding: 1.5rem;
+    padding: 1rem;
+  }
+  .card-header .title {
+    font-size: 1.5rem;
   }
 }
