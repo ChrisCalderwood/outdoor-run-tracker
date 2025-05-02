@@ -44,11 +44,11 @@ app.post('/api/location', async (req, res) => {
 
   // Extract the Cognito user ID (sub) from the token
   const userId   = payload.sub;
-  const { latitude, longitude, timestamp } = req.body;
+  const { latitude, longitude, timestamp, runId } = req.body;
 
   const params = {
     TableName: process.env.LOCATION_TABLE,
-    Item:      { userId, timestamp, latitude, longitude }
+    Item:      { userId, runId, timestamp, latitude, longitude }
   };
 
   try {
@@ -78,20 +78,33 @@ app.get('/api/summary/:runId', async (req, res) => {
   // Query all points for this user/run
   const params = {
     TableName: process.env.LOCATION_TABLE,
-    IndexName: 'userId-runId-index',           // see note below
-    KeyConditionExpression: 'userId = :uid AND runId = :rid',
-    ExpressionAttributeValues: {
-      ':uid': userId,
-      ':rid': runId
-    }
+    KeyConditionExpression: 'userId = :uid',
+    ExpressionAttributeValues: { ':uid': userId },
+    ConsistentRead: true
    };
 
-   try {
-    const { Items } = await ddb.query(params).promise();
+  try {
+    const { Items: allItems } = await ddb.query(params).promise();
+    const Items = allItems.filter(item => item.runId === runId);
     if (!Items.length) return res.json({ message: 'No points found.' });
    
     // Sort by timestamp
     Items.sort((a, b) => a.timestamp - b.timestamp);
+
+    if (Items.length < 2) {
+      return res.json({
+        message: 'Not enough data to summarize',
+        pointCount: Items.length
+      });
+    }
+
+    const totalTime = (Items[Items.length-1].timestamp - Items[0].timestamp) / 1000;
+    if (totalTime <= 0) {
+      return res.json({
+        message: 'Run duration too short',
+        pointCount: Items.length
+      });
+    }
    
     // Haversine formula
     const toRad = x => (x * Math.PI) / 180;
@@ -113,7 +126,7 @@ app.get('/api/summary/:runId', async (req, res) => {
       totalDist += d;
       if (speed > maxSpeed) maxSpeed = speed;
     }
-    const totalTime = (Items[Items.length-1].timestamp - Items[0].timestamp) / 1000;
+    
     const avgSpeed  = totalDist / totalTime;
    
     res.json({
@@ -123,11 +136,49 @@ app.get('/api/summary/:runId', async (req, res) => {
       maxSpeedMps:         maxSpeed,
       pointCount:          Items.length
     });
-   } catch (err) {
+  } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to compute summary' });
-   }
-  });
+  }
+});
+
+// GET /api/runs
+app.get('/api/runs', async (req, res) => {
+  const token = req.headers.authorization;
+  if (!token) return res.status(401).json({ error: 'Missing auth token' });
+
+  let payload;
+  try {
+    payload = await verifier.verify(token);
+  } catch {
+    return res.status(403).json({ error: 'Invalid token' });
+  }
+  const userId = payload.sub;
+
+  // Query all items for this user, strongly consistent
+  const params = {
+    TableName: process.env.LOCATION_TABLE,
+    KeyConditionExpression: 'userId = :uid',
+    ExpressionAttributeValues: { ':uid': userId },
+    ConsistentRead: true
+  };
+  const { Items } = await ddb.query(params).promise();
+
+  // Group by runId -> pick earliest timestamp as startTime
+  const runsMap = Items.reduce((map, item) => {
+    const { runId, timestamp } = item;
+    if (!map[runId] || timestamp < map[runId].startTime) {
+      map[runId] = { runId, startTime: timestamp };
+    }
+    return map;
+  }, {});
+
+  // Convert to array & sort descending by startTime
+  const runs = Object.values(runsMap)
+    .sort((a,b) => b.startTime - a.startTime);
+
+  res.json(runs);
+});
 
 // ——— Start the Server ———
 app.listen(PORT, () => {
