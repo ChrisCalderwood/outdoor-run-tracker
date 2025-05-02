@@ -7,6 +7,7 @@ import App from './App';
 import { Amplify } from 'aws-amplify';
 import awsExports from './aws-exports';
 import { Authenticator } from '@aws-amplify/ui-react';
+import { BrowserRouter } from 'react-router-dom';
 
 Amplify.configure(awsExports);
 
@@ -14,10 +15,10 @@ Amplify.configure(awsExports);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Authenticator 
-      loginMechanisms={['email']} 
-      signUpAttributes={['email']}>
-    <App />
+    <BrowserRouter>
+    <Authenticator loginMechanisms={['email']} signUpAttributes={['email']}>
+      <App />
     </Authenticator>
+    </BrowserRouter>
   </React.StrictMode>
 );
