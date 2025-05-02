@@ -16,48 +16,67 @@ function App() {
   const runIdRef = useRef(null);
   const intervalIdRef = useRef(null);
 
+   // Two Geolocation option sets for high vs. low accuracy:
+   const GEO_OPTIONS_HIGH = {
+    enableHighAccuracy: true,
+    maximumAge: 0,
+    timeout: 10000,
+  };
+  const GEO_OPTIONS_LOW = {
+    enableHighAccuracy: false,
+    maximumAge: 0,
+    timeout: 15000,
+  };
+
+  // Success handler — pulls the session, POSTs to /api/location
+  async function handlePositionSuccess(position) {
+    const data = {
+      runId: runIdRef.current,
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      // server assigns timestamp, so we don’t send it
+    };
+
+    try {
+      const { tokens } = await fetchAuthSession();
+      const idToken = tokens.idToken;
+      await axios.post('/api/location', data, {
+        headers: { Authorization: idToken }
+      });
+      console.log('Location saved:', data);
+    } catch (err) {
+      console.error('Error saving location:', err);
+    }
+  }
+
+  // Error handler — on timeout, retry with low-accuracy settings
+  function handlePositionError(err) {
+    console.error('Geolocation error:', err);
+    if (err.code === err.TIMEOUT || err.code === 3) {
+      navigator.geolocation.getCurrentPosition(
+        handlePositionSuccess,
+        handlePositionError,
+        GEO_OPTIONS_LOW
+      );
+    }
+  }
+
   const handleStartStop = () => {
     if (!tracking) {
-      setSummary(null);     // clear last summary
-
-      // Start polling every 10 seconds
+      setSummary(null); // clear the last summary
       runIdRef.current = uuidv4();
+
+      // 4) Start polling using the named handlers & high-accuracy options
       intervalIdRef.current = setInterval(() => {
         navigator.geolocation.getCurrentPosition(
-          async position => {
-            const data = {
-              runId: runIdRef.current,
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              timestamp: position.timestamp
-            };
-
-            // Get the user's ID token
-            const { tokens } = await fetchAuthSession();;
-            const idToken  = tokens.idToken;
-
-            // Send to backend
-            await axios.post('/api/location', data, {
-              headers: { Authorization: idToken }
-            })
-              .then(res => console.log('Location saved:', res.data))
-              .catch(err => console.error('Error saving location:', err));
-          },
-          error => {
-            console.error('Geolocation error:', error);
-          },
-          {
-            enableHighAccuracy: true,
-            maximumAge: 0,
-            timeout: 10000
-          }
+          handlePositionSuccess,
+          handlePositionError,
+          GEO_OPTIONS_HIGH
         );
-      }, 10000); // 10000ms = 10s
+      }, 10000);
 
-      //intervalIdRef.current = id;
       setTracking(true);
     } else {
-      // Stop polling
       clearInterval(intervalIdRef.current);
       intervalIdRef.current = null;
       setTracking(false);

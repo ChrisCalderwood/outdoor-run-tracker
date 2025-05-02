@@ -44,7 +44,9 @@ app.post('/api/location', async (req, res) => {
 
   // Extract the Cognito user ID (sub) from the token
   const userId   = payload.sub;
-  const { latitude, longitude, timestamp, runId } = req.body;
+  const { latitude, longitude, runId } = req.body;
+  // Server assigns a unique timestamp
+  const timestamp = Date.now();
 
   const params = {
     TableName: process.env.LOCATION_TABLE,
