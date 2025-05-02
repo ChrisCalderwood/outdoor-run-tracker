@@ -1,0 +1,40 @@
+{
+  "CallerReference": "run-tracker-frontend-abc-20250502-1500",
+  "Comment": "Run Tracker Frontend",
+  "Enabled": true,
+  "Origins": {
+    "Quantity": 1,
+    "Items": [
+      {
+        "Id": "S3-run-tracker-frontend-abc",
+        "DomainName": 
+"run-tracker-frontend-abc.s3.us-east-2.amazonaws.com",
+        "OriginPath": "",
+        "S3OriginConfig": {
+          "OriginAccessIdentity": ""
+        }
+      }
+    ]
+  },
+  "DefaultCacheBehavior": {
+    "TargetOriginId": "S3-run-tracker-frontend-abc",
+    "ViewerProtocolPolicy": "redirect-to-https",
+    "AllowedMethods": {
+      "Quantity": 2,
+      "Items": ["GET","HEAD"],
+      "CachedMethods": {
+        "Quantity": 2,
+        "Items": ["GET","HEAD"]
+      }
+    },
+    "Compress": true,
+    "ForwardedValues": {
+      "QueryString": false,
+      "Cookies": { "Forward": "none" }
+    },
+    "MinTTL": 0,
+    "DefaultTTL": 86400,
+    "MaxTTL": 31536000
+  },
+  "DefaultRootObject": "index.html"
+}
