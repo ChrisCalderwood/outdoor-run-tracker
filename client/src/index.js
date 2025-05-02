@@ -8,6 +8,9 @@ import { Amplify } from 'aws-amplify';
 import awsExports from './aws-exports';
 import { Authenticator } from '@aws-amplify/ui-react';
 import { BrowserRouter } from 'react-router-dom';
+import axios from 'axios';
+
+axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL;
 
 Amplify.configure(awsExports);
 
