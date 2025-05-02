@@ -30,21 +30,28 @@ export default function Summary() {
   if (!summary) return <p>Loading…</p>;
 
   return (
-    <div className="stats-card">
-      <button className="btn-nav" onClick={() => navigate(-1)}>
+    <div className="summary-page">
+      <button className="btn-nav summary-back" onClick={() => navigate(-1)}>
         ← Back
       </button>
-      {summary.message ? (
-        <p>{summary.message}</p>
-      ) : (
-        <>
-          <h2>Run Summary</h2>
-          <p>Distance: {(summary.totalDistanceMeters/1000).toFixed(2)} km</p>
-          <p>Time: {Math.round(summary.totalTimeSeconds)} sec</p>
-          <p>Avg Speed: {(summary.averageSpeedMps*3.6).toFixed(2)} km/h</p>
-          <p>Top Speed: {(summary.maxSpeedMps*3.6).toFixed(2)} km/h</p>
-        </>
-      )}
+
+      <div className="card summary-card">
+        <header className="card-header">
+          <h2 className="title">Run Summary</h2>
+        </header>
+        <div className="stats-card">
+          {summary.message ? (
+            <p>{summary.message}</p>
+          ) : (
+            <>
+              <p>Distance: {(summary.totalDistanceMeters / 1000).toFixed(2)} km</p>
+              <p>Time: {Math.round(summary.totalTimeSeconds)} sec</p>
+              <p>Avg Speed: {(summary.averageSpeedMps * 3.6).toFixed(2)} km/h</p>
+              <p>Top Speed: {(summary.maxSpeedMps * 3.6).toFixed(2)} km/h</p>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
